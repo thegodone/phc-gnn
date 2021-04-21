@@ -78,7 +78,7 @@ def matvec_product(W: nn.ParameterList, x: torch.Tensor,
     #H = torch.stack([kronecker_product(Ai, Wi) for Ai, Wi in zip(phm_rule, W)], dim=0).sum(0)
     A = torch.stack([Ai for Ai in phm_rule], dim=0)
     W = torch.stack([Wi for Wi in W], dim=0)
-    H = kronecker_product(A, W).sum(0)
+    H = torch.kron(A, W).sum(0)
 
     y = torch.mm(H, x.t()).t()
     #y = (H @ x.T).T
