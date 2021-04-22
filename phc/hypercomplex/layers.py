@@ -80,8 +80,13 @@ def matvec_product(W: nn.ParameterList, x: torch.Tensor,
     W = torch.stack([Wi for Wi in W], dim=0)
     H = torch.kron(A, W).sum(0)
 
-    y = torch.mm(H, x.t()).t()
-    #y = (H @ x.T).T
+    #y = torch.mm(H, x.t()).t()
+    # avoid one transpose for speed other alternative tested 
+    # ( x @ H.t() is slower , 
+    # torch.einsum('ik,jk->ij', [x, H]) very slower, 
+    # torch.matmul(x, H.t()) is slower)
+    y = x.mm(H.t())
+    
     if bias is not None:
         bias = torch.cat([b for b in bias], dim=-1)
         y += bias
